@@ -109,11 +109,11 @@ SortScore = function(ScoresToSort) {
 
 
 CheckHealth = function() {
-    if (health[current] > health[min] && health[current] < health[max]) {
+    if (health[current] > health[min] && health[current] <= health[max]) {
         //player is alive
         return 'alive';
     }
-    if (health[current] < health[min]) {
+    if (health[current] <= health[min]) {
         //player is dead.
         return 'dead';
     }
