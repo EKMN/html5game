@@ -1,0 +1,1 @@
+Most of the functions in this game are global, ie. they do not have the "VAR" keyword infront.
