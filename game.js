@@ -1,18 +1,27 @@
 /* Javascript test game (C) 2014 Johannes Ekman - Jekk */
 //function names always begin with capital letter. All functions are in logic order
 
-//variables
+//variables. Standard array syntax: var arr = []; for (simple) array or var arr = {}; for object-array.
 var audioPreloaded, videoPreloaded = false;
+var notPaused = false; //whether game is paused or not.
 var initialScene = 1;
 var currentScene; //takes a value between 1 and 18
 var lastScene = 18;
-var audiofiles = []; //preloadable audio files. Sample syntax: a_hit: 'assets/audio/a_hit.mp3'
-var videofiles = []; //preloadable video files. Sample syntax: v_cannon_sprite: 'assets/video/cannon_sprite.png'
-var gameStarted = false;
 var gameOver = false; //whether the game is over or not. Will turn to true when the game ends
-var scenes = []; //scene names and locations. Sample syntax: scene1: 'assets/scene1.js'
-var scores = [initialScore: '', bonusMultiplier: '', highScore: '', newRecord: false]; // '' means string; should probably just be a number.
-var health = [min: '0', max: '100', current: ''];
+var scenes = {}; //scene names and locations. Sample syntax: 1: 'assets/scene1.js' where "1" means the scene number and its value the relative path to the file.
+var audiofiles = {}; //preloadable audio files. Sample syntax: a_hit: 'assets/audio/a_hit.mp3'
+var videofiles = {}; //preloadable video files. Sample syntax: v_cannon_sprite: 'assets/video/cannon_sprite.png'
+var scores = {
+    initialScore: '0',
+    bonusMultiplier: '1',
+    highScore: '',
+    newRecord: false
+};
+var health = {
+    min: '0',
+    max: '100',
+    current: ''
+};
 // newRecord should be changed to true whener a new record is made and set to false whenever a new game is started and it should remain false until yet another record is made
 
 
@@ -59,7 +68,6 @@ ResetGamescene = function() {
 
 
 
-
 HandleInput = function() {
     //handles input with many smaller functions
     var ControlInput = function() {
@@ -69,13 +77,19 @@ HandleInput = function() {
         //quit the game. Combo to check for is escape pressed twice.
     }
     var MoveCharacter = function() {
-        //move the character by the x,y-axises. Return the x- and y-values by returing an array with the name "charCords[]". It can be accessed by charCords[x] and charCords[y]. eg charCords[x: '500', y: '450'];
+        //move the character by the x,y-axises. Return the x- and y-values by returing an array with the name "charCords[]". It can be accessed by charCords[x] and charCords[y] or perhaps charCords{x,y}. eg charCords{x: '500', y: '450'};
     }
     var PauseGame = function() {
         //freeze gametime or the while loop
     }
-}
 
+    //certain conditions should apply to running these functions., ie. moveCharacter only works when the game is not paused. 
+    // TODO: MoveCharacter(); should only work when gamePaused is not (!=) true, ie. only when it is (==) false.
+    ControlInput();
+    QuitGame();
+    MoveCharacter();
+    PauseGame();
+}
 
 
 
@@ -86,6 +100,9 @@ SetScore = function(scores) {
 }
 UpdateScore = function(oldScores) {
     //updates the scores
+}
+SortScore = function(ScoresToSort) {
+    //TODO: Implementation. It should use the .sort(); function on the array tables to sort the saved values by the biggest one on top.
 }
 
 
@@ -120,12 +137,13 @@ UpdateFrame = function(cordinates, gamescene) {
 PreloadAudio();
 PreloadSprites();
 
-
 //create the gamescene initially.
 CreateGamescene();
 
-//sets the scores
+//sets the scores initially.
 SetScore();
+
+
 
 
 GameLoop = function(tickrate) {
@@ -135,14 +153,14 @@ GameLoop = function(tickrate) {
     while (true) {
 
         HandleInput(); //updates the input cordinates each tick
-        UpdateFrame(); //updates the graphics each tick
         UpdateScore(); //updates the score each tick
+        UpdateFrame(); //updates the graphics each tick
 
-        //scene & game handler. As long as current scene is less that last scene and bigger or as big as firstscene then the condition will be true
-        if (currentScene < lastScene && currentScene >= initialScene) {
+        //scene & game handler. As long as current scene is less  or equal to last scene and bigger or as big as firstscene then the condition will be true
+        if (currentScene <= lastScene && currentScene >= initialScene) {
             for (var i = 0; i++; i < lastScene) //creates the scene change watches
                 if (i == currentScene) { //if the number matches currentScene then change to that Scene
-                    UpdateGamescene(i); //updates the gamescene with the number of i, ie if "i" has the value of 15, then UpdateGamescene will update the scene to levels[15].
+                    UpdateGamescene(i); //updates the gamescene with the number of i, ie if "i" has the value of 15, then UpdateGamescene will update the scene to scenes[15].
                 }
         }
         //check if the player is dead and if true sets gameover to true
@@ -157,9 +175,10 @@ GameLoop = function(tickrate) {
 
         //checks if the game is over
         if (gameOver = true) {
-            ResetGamescene();
-            SetScore(),
-            gameOver = false;
+            UpdateScore(); //updates all the scores
+            SortScore(); //sorts whatever scores have been set & saved.
+            ResetGamescene(); //resets the gamescene (restarts the game).
+            gameOver = false; //sets the gameOver-boolean to false.
         }
     }
 }
