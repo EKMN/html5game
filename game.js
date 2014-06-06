@@ -105,7 +105,7 @@ CheckHealth = function() {
 
 
 
-UpdateFrame = function(cordinates, gamescene, ) {
+UpdateFrame = function(cordinates, gamescene) {
     //update frame. Updates only the graphics.
     //update the graphics depending on the player movement returned cordinates. Also updates depending on the gamescene
     //if the gamescene changes, ie. gamescene != gamescene_old_value, then fade in and out and change the scene 
@@ -117,10 +117,9 @@ UpdateFrame = function(cordinates, gamescene, ) {
 // I N I T I A L I Z A T I O N (could be wrapped into init = function(); )
 
 //preloads the resources automatically with the auto-invokers
-(preload = function() {
-    PreloadAudio();
-    PreloadSprites();
-});
+PreloadAudio();
+PreloadSprites();
+
 
 //create the gamescene initially.
 CreateGamescene();
@@ -134,13 +133,12 @@ GameLoop = function(tickrate) {
     //gameloop (logic, update, ie.)
     //TODO: create a tickrate handler. Also the best way would probably be to make a GameLoop class so the user would be able to configure
     while (true) {
-        var SceneChanged = currentScene; // if this differs from "CurrentScene" then see the if below
 
         HandleInput(); //updates the input cordinates each tick
         UpdateFrame(); //updates the graphics each tick
         UpdateScore(); //updates the score each tick
 
-        //scene & game handler
+        //scene & game handler. As long as current scene is less that last scene and bigger or as big as firstscene then the condition will be true
         if (currentScene < lastScene && currentScene >= initialScene) {
             for (var i = 0; i++; i < lastScene) //creates the scene change watches
                 if (i == currentScene) { //if the number matches currentScene then change to that Scene
@@ -163,10 +161,6 @@ GameLoop = function(tickrate) {
             SetScore(),
             gameOver = false;
         }
-
-        //if currentScene-variable has changed, change the scene to it's value (ie. currentScene 3 means level 3). 
-
-
     }
 }
 
